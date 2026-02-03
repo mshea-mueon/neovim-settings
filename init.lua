@@ -4,7 +4,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
-
 vim.opt.termguicolors = true
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
@@ -27,6 +26,22 @@ vim.o.mouse = 'a'
 
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
+
+-- CLIPBOARD SETTINGS
+
+-- WSL <-> Windows clipboard without ^M
+vim.g.clipboard = {
+  name = 'win32yank-wsl',
+  copy = {
+    ['+'] = 'win32yank -i --crlf',
+    ['*'] = 'win32yank -i --crlf',
+  },
+  paste = {
+    ['+'] = 'win32yank -o --lf',
+    ['*'] = 'win32yank -o --lf',
+  },
+  cache_enabled = 0,
+}
 
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
@@ -70,6 +85,9 @@ vim.o.splitbelow = true
 vim.o.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
+vim.opt.fileformats = { 'unix', 'dos' }
+vim.opt.fileformat = 'unix'
+
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
 
@@ -84,10 +102,10 @@ vim.o.scrolloff = 10
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
-vim.opt.tabstop = 4         -- Sets the visual width of a tab character
-vim.opt.shiftwidth = 4      -- Sets the number of spaces used for auto-indentation
-vim.opt.expandtab = true    -- Converts tabs to spaces when inserting
-vim.opt.softtabstop = 4     -- Number of spaces a <Tab> counts for in insert mode
+vim.opt.tabstop = 4 -- Sets the visual width of a tab character
+vim.opt.shiftwidth = 4 -- Sets the number of spaces used for auto-indentation
+vim.opt.expandtab = true -- Converts tabs to spaces when inserting
+vim.opt.softtabstop = 4 -- Number of spaces a <Tab> counts for in insert mode
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -134,10 +152,10 @@ vim.keymap.set('n', '<S-Tab>', ':bprevious<CR>')
 --  See `:help lua-guide-autocommands`
 
 -- Syntax Highlighting for things that don't come with the nvim default package
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-  pattern = "*.njk",
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  pattern = '*.njk',
   callback = function()
-    vim.bo.filetype = "html" --Use html highlighting
+    vim.bo.filetype = 'html' --Use html highlighting
   end,
 })
 
@@ -180,8 +198,9 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  {'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
-    config = true
+  {
+    'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+    config = true,
   },
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -345,7 +364,7 @@ require('lazy').setup({
           mappings = {
             i = { ['<c-enter>'] = 'to_fuzzy_refine' },
           },
-          path_display = {"smart"},
+          path_display = { 'smart' },
         },
         -- pickers = {}
         extensions = {
@@ -354,8 +373,8 @@ require('lazy').setup({
           },
         },
         pickers = {
-          find_files = { hidden = true}
-        }
+          find_files = { hidden = true },
+        },
       }
 
       -- Enable Telescope extensions if they are installed
@@ -366,7 +385,7 @@ require('lazy').setup({
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles'})
+      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -814,28 +833,66 @@ require('lazy').setup({
     },
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
-      }
+  --  { -- You can easily change to a different colorscheme.
+  --    -- Change the name of the colorscheme plugin below, and then
+  --    -- change the command in the config to whatever the name of that colorscheme is.
+  --    --
+  --    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+  --    'bluz71/vim-moonfly-colors',
+  --    lazy = false,
+  --    priority = 1000, -- Make sure to load this before all the other start plugins.
+  --    config = function()
+  --      ---@diagnostic disable-next-line: missing-fields
+  --
+  --      -- Load the colorscheme here.
+  --      -- Like many other themes, this one has different styles, and you could load
+  --      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+  --      vim.cmd.colorscheme 'moonfly'
+  --    end,
+  --  },
+  --  { -- Colorscheme: Tokyodark
+  --    'tiagovla/tokyodark.nvim',
+  --    lazy = false,
+  --    priority = 1000,
+  --    opts = {
+  --      transparent_background = false,
+  --      gamma = 1.00,
+  --      styles = {
+  --        comments = { italic = false }, -- tweak to taste
+  --        keywords = { italic = false },
+  --        identifiers = { italic = false },
+  --        functions = {},
+  --        variables = {},
+  --      },
+  --      terminal_colors = true,
+  --    },
+  --    config = function(_, opts)
+  --      require('tokyodark').setup(opts) -- optional, but recommended if using opts
+  --      vim.cmd.colorscheme 'tokyodark'
+  --    end,
+  --  },
 
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'retrobox'
+  { -- Colorscheme: Cyberdream
+    'scottmckendry/cyberdream.nvim',
+    lazy = false,
+    priority = 1000,
+    opts = {
+      transparent_background = false,
+      gamma = 1.00,
+      styles = {
+        comments = { italic = false }, -- tweak to taste
+        keywords = { italic = false },
+        identifiers = { italic = false },
+        functions = {},
+        variables = {},
+      },
+      terminal_colors = true,
+    },
+    config = function(_, opts)
+      require('cyberdream').setup(opts) -- optional, but recommended if using opts
+      vim.cmd.colorscheme 'cyberdream'
     end,
   },
-
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -876,10 +933,11 @@ require('lazy').setup({
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
+
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    branch = 'main',
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
       ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
@@ -900,9 +958,11 @@ require('lazy').setup({
     --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+    config = function(_, opts)
+      require('nvim-treesitter').setup(opts)
+    end,
   },
-
-  -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
+  -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the  -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
 
@@ -924,7 +984,7 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   { import = 'custom.plugins' },
   --
-  require 'custom.plugins.init'
+  require 'custom.plugins.init',
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
   -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
