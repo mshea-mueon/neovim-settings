@@ -1,8 +1,32 @@
+---@diagnostic disable: undefined-global
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+
+vim.opt.guicursor = table.concat({
+  'n-v-c:block-Cursor',
+  'i-ci-ve:ver25-Cursor',
+  'r-cr-o:hor20-Cursor',
+}, ',')
+--vim.api.nvim_set_hl(0, 'Cursor', { reverse = true })
+
+vim.api.nvim_set_hl(0, 'Search', {
+  bg = '#ff9e64',
+  fg = '#000000',
+})
+
+vim.api.nvim_set_hl(0, 'IncSearch', {
+  bg = '#7aa2f7',
+  fg = '#000000',
+})
+
+vim.api.nvim_set_hl(0, 'CurSearch', {
+  bg = '#bb9af7',
+  fg = '#000000',
+})
 
 vim.opt.termguicolors = true
 
@@ -170,6 +194,13 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+--RDL syntax
+vim.filetype.add {
+  extension = {
+    rdl = 'systemrdl',
+  },
+}
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -198,6 +229,7 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
+  { 'vim-scripts/systemrdl.vim' },
   {
     'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
     config = true,
@@ -250,7 +282,6 @@ require('lazy').setup({
   --
   -- Then, because we use the `opts` key (recommended), the configuration runs
   -- after the plugin has been loaded as `require(MODULE).setup(opts)`.
-
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
@@ -429,6 +460,12 @@ require('lazy').setup({
       library = {
         -- Load luvit types when the `vim.uv` word is found
         { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+        { path = vim.env.VIMRUNTIME, words = { 'vim' } },
+      },
+      integrations = {
+        cmp = true,
+        lspconfig = true,
+        blink = true,
       },
     },
   },
@@ -650,8 +687,23 @@ require('lazy').setup({
               completion = {
                 callSnippet = 'Replace',
               },
+              runtime = { version = 'LuaJIT' },
               -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
               -- diagnostics = { disable = { 'missing-fields' } },
+              diagnostics = { globals = { 'vim' } },
+              telemetry = { enable = false },
+              workspace = {
+                -- ─────────────── Most effective way ───────────────
+                library = {
+                  vim.fn.stdpath 'config',
+                  vim.fn.stdpath 'data' .. '/lazy/lazy.nvim/lua/lazy',
+                  '${3rd}/luv/library',
+                  vim.env.VIMRUNTIME,
+                },
+
+                -- prevents lua_ls from asking "configure workspace?"
+                checkThirdParty = false,
+              },
             },
           },
         },
@@ -962,6 +1014,10 @@ require('lazy').setup({
       require('nvim-treesitter').setup(opts)
     end,
   },
+  'kdheepak/lazygit.nvim',
+  dependencies = { 'nvim-lua/plenary.nvim' },
+  cmd = { 'LazyGit', 'LazyGitConfig', 'LazyGitCurrentFile', 'LazyGitFilter', 'LazyGitFilterCurrentFile' },
+  keys = { { '<leader>lg', '<cmd>LazyGit<cr>', desc = 'Open lazy git' } },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the  -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
