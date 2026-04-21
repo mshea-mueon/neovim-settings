@@ -6,11 +6,9 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
-vim.opt.guicursor = table.concat({
-  'n-v-c:block-Cursor',
-  'i-ci-ve:ver25-Cursor',
-  'r-cr-o:hor20-Cursor',
-}, ',')
+-- Some terminals briefly print raw cursor-shape escape codes during startup.
+-- Leaving guicursor empty keeps the terminal default and avoids the launch artifacts.
+vim.opt.guicursor = ''
 --vim.api.nvim_set_hl(0, 'Cursor', { reverse = true })
 
 vim.api.nvim_set_hl(0, 'Search', {
@@ -709,6 +707,18 @@ require('lazy').setup({
         },
       }
 
+      if vim.fn.executable 'verible-verilog-ls' == 1 then
+        servers.verible = {
+          filetypes = { 'systemverilog', 'verilog' },
+          on_attach = function(client)
+            -- Verible has crashed in this setup on formatting requests, so keep LSP features
+            -- but leave formatting to a dedicated formatter command if you want it.
+            client.server_capabilities.documentFormattingProvider = false
+            client.server_capabilities.documentRangeFormattingProvider = false
+          end,
+        }
+      end
+
       -- Ensure the servers and tools above are installed
       --
       -- To check the current status of installed tools and/or manually install
@@ -884,46 +894,6 @@ require('lazy').setup({
       signature = { enabled = true },
     },
   },
-
-  --  { -- You can easily change to a different colorscheme.
-  --    -- Change the name of the colorscheme plugin below, and then
-  --    -- change the command in the config to whatever the name of that colorscheme is.
-  --    --
-  --    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  --    'bluz71/vim-moonfly-colors',
-  --    lazy = false,
-  --    priority = 1000, -- Make sure to load this before all the other start plugins.
-  --    config = function()
-  --      ---@diagnostic disable-next-line: missing-fields
-  --
-  --      -- Load the colorscheme here.
-  --      -- Like many other themes, this one has different styles, and you could load
-  --      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  --      vim.cmd.colorscheme 'moonfly'
-  --    end,
-  --  },
-  --  { -- Colorscheme: Tokyodark
-  --    'tiagovla/tokyodark.nvim',
-  --    lazy = false,
-  --    priority = 1000,
-  --    opts = {
-  --      transparent_background = false,
-  --      gamma = 1.00,
-  --      styles = {
-  --        comments = { italic = false }, -- tweak to taste
-  --        keywords = { italic = false },
-  --        identifiers = { italic = false },
-  --        functions = {},
-  --        variables = {},
-  --      },
-  --      terminal_colors = true,
-  --    },
-  --    config = function(_, opts)
-  --      require('tokyodark').setup(opts) -- optional, but recommended if using opts
-  --      vim.cmd.colorscheme 'tokyodark'
-  --    end,
-  --  },
-
   { -- Colorscheme: Cyberdream
     'scottmckendry/cyberdream.nvim',
     lazy = false,
@@ -1014,10 +984,12 @@ require('lazy').setup({
       require('nvim-treesitter').setup(opts)
     end,
   },
-  'kdheepak/lazygit.nvim',
-  dependencies = { 'nvim-lua/plenary.nvim' },
-  cmd = { 'LazyGit', 'LazyGitConfig', 'LazyGitCurrentFile', 'LazyGitFilter', 'LazyGitFilterCurrentFile' },
-  keys = { { '<leader>lg', '<cmd>LazyGit<cr>', desc = 'Open lazy git' } },
+  {
+    'kdheepak/lazygit.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    cmd = { 'LazyGit', 'LazyGitConfig', 'LazyGitCurrentFile', 'LazyGitFilter', 'LazyGitFilterCurrentFile' },
+    keys = { { '<leader>lg', '<cmd>LazyGit<cr>', desc = 'Open lazy git' } },
+  },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the  -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -1039,8 +1011,6 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   { import = 'custom.plugins' },
-  --
-  require 'custom.plugins.init',
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
   -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
