@@ -52,18 +52,18 @@ vim.o.showmode = false
 -- CLIPBOARD SETTINGS
 
 -- WSL <-> Windows clipboard without ^M
-vim.g.clipboard = {
-  name = 'win32yank-wsl',
-  copy = {
-    ['+'] = 'win32yank -i --crlf',
-    ['*'] = 'win32yank -i --crlf',
-  },
-  paste = {
-    ['+'] = 'win32yank -o --lf',
-    ['*'] = 'win32yank -o --lf',
-  },
-  cache_enabled = 0,
-}
+--vim.g.clipboard = {
+--  name = 'win32yank-wsl',
+--  copy = {
+--    ['+'] = 'win32yank -i --crlf',
+--    ['*'] = 'win32yank -i --crlf',
+--  },
+--  paste = {
+--    ['+'] = 'win32yank -o --lf',
+--    ['*'] = 'win32yank -o --lf',
+--  },
+--  cache_enabled = 0,
+--}
 
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
